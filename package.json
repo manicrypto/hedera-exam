@@ -1,0 +1,30 @@
+{
+  "name": "account_info",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@hashgraph/sdk": "^2.16.6",
+    "dotenv": "^16.0.1"
+  },
+  "scripts": {
+    "start:createaccount": "node Account/scripts/create-account.js",
+    "start:myaccountbalance": "node Account/scripts/getMyAccountInfo.js",
+    "start:transfer": "node scripts/transferHbar.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:createtopic": "node Consensus_Service/scripts/createTopic.js",
+    "start:subscribe": "node Consensus_Service/scripts/subscribeTopic.js",
+    "start:submitmessage": "node Consensus_Service/scripts/submitMessage.js",
+    "start:createfungible": "node Token_Service/scripts/taskFungible/createToken.js",
+    "start:pauseToken": "node Token_Service/scripts/taskFungible/pauseToken.js",
+    "start:UnpauseToken": "node Token_Service/scripts/taskFungible/UnpauseToken.js",
+    "start:IncreaseSupply": "node Token_Service/scripts/taskFungible/IncreaseSupply.js",
+    "start:queryfungible": "node Token_Service/scripts/taskFungible/queryBalance.js",
+    "start:createscheduledtx": "node Scheduled_TX/scripts/createScheduledTx.js",
+    "start:getscheduledtxinfo": "node Scheduled_TX/scripts/getScheduledTxInfo.js",
+    "start:deletescheduledtx": "node Scheduled_TX/scripts/deleteScheduledTx.js",
+    "start:submitsignature": "node Scheduled_TX/scripts/submitSignature.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
