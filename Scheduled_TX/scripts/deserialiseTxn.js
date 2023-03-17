@@ -2,10 +2,6 @@ import {
   TransferTransaction,
   Client,
   ScheduleCreateTransaction,
-  PrivateKey,
-  Hbar,
-  Wallet,
-  Transaction,
 } from "@hashgraph/sdk";
 
 import dotenv from "dotenv";
@@ -39,39 +35,27 @@ const client = Client.forTestnet();
 
 client.setOperator(myAccountId, myPrivateKey);
 
+const scheduleTxBase64 = accounts.serialisedTransaction;
+
 async function main() {
   // const adminUser = new Wallet(accountId, privateKey);
+  let deserializedData = Buffer.from(scheduleTxBase64, 'base64').toString();
 
-  //Create a transaction to schedule
-  const transaction = new TransferTransaction()
-    .addHbarTransfer(firstAccountId, new Hbar(-1))
-    .addHbarTransfer(secondAccountId, new Hbar(1));
+  // deserialize the hash
+  let transaction = JSON.parse(deserializedData);
 
-  //Schedule a transaction
-  const scheduleTransaction = await new ScheduleCreateTransaction()
-    .setScheduledTransaction(transaction)
-    .setScheduleMemo("Scheduled transaction!")
-    .setAdminKey(myPrivateKey)
-    .execute(client);
+  const scheduleTransaction = new ScheduleCreateTransaction(transaction)
+      .sign(firstAccountPrivateKey);
+
+  //Sign with the client operator key to pay for the transaction and submit to a Hedera network
+  const txResponse = await scheduleTransaction.execute(client);
 
   //Get the receipt of the transaction
-  const receipt = await scheduleTransaction.getReceipt(client);
+  const receipt = await txResponse.getReceipt(client);
 
-  //Get the schedule ID
-  const scheduleId = receipt.scheduleId;
-  console.log("The schedule ID is " + scheduleId);
-
-  //Get the scheduled transaction ID
-  const scheduledTxId = receipt.scheduledTransactionId;
-  console.log("The scheduled transaction ID is " + scheduledTxId);
-
-  // Serialise and export the transaction to a base 64
-  let serializedData = JSON.stringify(scheduleTransaction);
-  let scheduledTxIdBase64 = Buffer.from(serializedData).toString("base64");
-
-  console.log(
-    "The scheduled transaction ID in base64 is " + scheduledTxIdBase64
-  );
+  //Get the transaction status
+  const transactionStatus = receipt.status;
+  console.log("The transaction consensus status is " + transactionStatus);  
 
   process.exit();
 }

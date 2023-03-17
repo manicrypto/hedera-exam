@@ -1,53 +1,65 @@
-const {
-    Client,
-    AccountBalanceQuery,
-    TransferTransaction,
-    Hbar,
-    PrivateKey
-} = require("@hashgraph/sdk");
-require('dotenv').config({ path: '.env' });
+// const {
+//     Client,
+//     AccountBalanceQuery,
+//     TransferTransaction,
+//     Hbar,
+//     PrivateKey
+// } = require("@hashgraph/sdk");
+// require('dotenv').config({ path: '.env' });
+
+import {
+  Client,
+  AccountBalanceQuery,
+  TransferTransaction,
+  Hbar,
+  PrivateKey,
+} from "@hashgraph/sdk";
+import dotenv from "dotenv";
+dotenv.config();
 
 const myAccountId = process.env.MY_ACCOUNT_ID;
 const myPrivateKey = PrivateKey.fromString(process.env.MY_PRIVATE_KEY);
 
-const otherAccountId = process.env.SECOND_ACCOUNT_ID;
-const otherPrivateKey = PrivateKey.fromString(process.env.SECOND_PRIVATE_KEY);
+const otherAccountId = process.env.FIRST_ACCOUNT_ID;
+const otherPrivateKey = PrivateKey.fromString(process.env.FIRST_PRIVATE_KEY);
 
 async function main() {
-    const client = Client.forTestnet();
+  const client = Client.forTestnet();
 
-    client.setOperator(myAccountId, myPrivateKey);
+  client.setOperator(otherAccountId, otherPrivateKey);
 
-    // Create the transfer transaction
-    const transaction = new TransferTransaction()
-    .addHbarTransfer(myAccountId, new Hbar(-100))
-    .addHbarTransfer(otherAccountId, new Hbar(100));
-    
-    console.log(`Doing transfer from ${myAccountId} to ${otherAccountId}`);
-    
-    // Sign with the client operator key and submit the transaction to a Hedera network
-    const txId = await transaction.execute(client);
+  // Create the transfer transaction
+  const transaction = new TransferTransaction()
+    .addHbarTransfer(otherAccountId, new Hbar(-100))
+    .addHbarTransfer(myAccountId , new Hbar(100));
 
-    // console.log(JSON.stringify(txId));
+  console.log(`Doing transfer from ${myAccountId} to ${otherAccountId}`);
 
-    // Request the receipt of the transaction
-    const receipt = await txId.getReceipt(client);
+  // Sign with the client operator key and submit the transaction to a Hedera network
+  const txId = await transaction.execute(client);
 
-    // console.log(JSON.stringify(receipt));
+  // console.log(JSON.stringify(txId));
 
-    // Get the transaction consensus status
-    const transactionStatus = receipt.status;
+  // Request the receipt of the transaction
+  const receipt = await txId.getReceipt(client);
 
-    console.log("The transaction consensus status is " + transactionStatus);
+  // console.log(JSON.stringify(receipt));
 
-    // Create the queries
-    const queryMine = new AccountBalanceQuery().setAccountId(myAccountId);
-    const queryOther = new AccountBalanceQuery().setAccountId(otherAccountId);
+  // Get the transaction consensus status
+  const transactionStatus = receipt.status;
 
-    const accountBalanceMine = await queryMine.execute(client);
-    const accountBalanceOther = await queryOther.execute(client);
+  console.log("The transaction consensus status is " + transactionStatus);
 
-    console.log(`My account balance ${accountBalanceMine.hbars} HBar, other account balance ${accountBalanceOther.hbars}`);
+  // Create the queries
+  const queryMine = new AccountBalanceQuery().setAccountId(myAccountId);
+  const queryOther = new AccountBalanceQuery().setAccountId(otherAccountId);
+
+  const accountBalanceMine = await queryMine.execute(client);
+  const accountBalanceOther = await queryOther.execute(client);
+
+  console.log(
+    `My account balance ${accountBalanceMine.hbars} HBar, other account balance ${accountBalanceOther.hbars}`
+  );
 }
 
 main();
